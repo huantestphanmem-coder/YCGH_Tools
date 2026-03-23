@@ -8,7 +8,11 @@
       "Bash(cat \"/private/var/folders/s4/s08cv__j057bz48mdkvcgddh0000gn/T/com.microsoft.Excel/Repair Result to YCGH_NT-060226-VSHCM-AH-NOTIFIER \\(2\\)0.xml\")",
       "Bash(cat \"/private/var/folders/s4/s08cv__j057bz48mdkvcgddh0000gn/T/com.microsoft.Excel/Repair Result to YCGH_NT-060226-VSHCM-AH-NOTIFIER \\(1\\)1.xml\")",
       "Bash(cat \"/private/var/folders/s4/s08cv__j057bz48mdkvcgddh0000gn/T/com.microsoft.Excel/Repair Result to YCGH_NT-060226-VSHCM-AH-NOTIFIER \\(1\\)0.xml\")",
-      "Bash(__NEW_LINE_a73bb5a01cbb8579__ echo:*)"
+      "Bash(__NEW_LINE_a73bb5a01cbb8579__ echo:*)",
+      "Read(//Users/huannguyen/.ssh/**)",
+      "Bash(ssh -T git@github.com)",
+      "Bash(ssh-add -l)",
+      "Bash(ssh-add ~/.ssh/huantestphanmem-coder-GitHub)"
     ]
   }
 }
