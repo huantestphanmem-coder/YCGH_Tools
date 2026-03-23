@@ -1,0 +1,115 @@
+*,::before,::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ── App Shell ── */
+.app{font-family:'Segoe UI',Tahoma,sans-serif;background:#07090f;color:#dde5f8;min-height:100vh;
+  background-image:radial-gradient(ellipse 70% 40% at 60% -10%,rgba(59,130,246,.08) 0%,transparent 60%)}
+
+/* ── Header ── */
+.hdr{height:52px;padding:0 20px;display:flex;align-items:center;gap:10px;background:rgba(7,9,15,.93);
+  border-bottom:1px solid #1e2a45;position:sticky;top:0;z-index:9}
+.logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#3b82f6,#6366f1);
+  display:grid;place-items:center;font-size:15px;flex-shrink:0}
+.ht{font-size:13px;font-weight:700}
+.hs{font-size:10px;color:#7a8bb0;margin-top:1px}
+.badge{margin-left:auto;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.28);
+  color:#10b981;padding:2px 9px;border-radius:20px;font-size:9px;font-weight:700;text-transform:uppercase}
+
+/* ── Layout ── */
+.wrap{max-width:980px;margin:0 auto;padding:20px 13px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.span2{grid-column:1/-1}
+
+/* ── Steps ── */
+.steps{display:flex;background:#0d1120;border:1px solid #1e2a45;border-radius:11px;overflow:hidden;margin-bottom:16px}
+.stp{flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border-right:1px solid #1e2a45;transition:background .3s}
+.stp:last-child{border-right:none}
+.stp.on{background:rgba(59,130,246,.09)}
+.stp.dn{background:rgba(16,185,129,.06)}
+.sn{width:22px;height:22px;border-radius:5px;flex-shrink:0;background:#253050;display:grid;place-items:center;
+  font-size:10px;font-weight:700;transition:all .3s}
+.stp.on .sn{background:#3b82f6}
+.stp.dn .sn{background:#10b981;color:#000}
+.sl{font-size:11.5px;font-weight:600;line-height:1.3}
+.ss{font-size:9px;color:#7a8bb0}
+
+/* ── Card ── */
+.card{background:#0d1120;border:1px solid #1e2a45;border-radius:12px;padding:16px}
+.ch{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#3e4f72;
+  margin-bottom:12px;display:flex;align-items:center;gap:5px}
+.ch b{color:#3b82f6;font-style:normal}
+
+/* ── File Upload ── */
+.dz{border:2px dashed #253050;border-radius:8px;padding:26px 12px;text-align:center;
+  cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.dz:hover,.dz.drag{border-color:#3b82f6;background:rgba(59,130,246,.07)}
+.dz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.fbadge{display:flex;align-items:center;gap:9px;background:rgba(16,185,129,.09);
+  border:1px solid rgba(16,185,129,.24);border-radius:7px;padding:8px 11px;margin-top:8px}
+.fbn{font-size:11.5px;font-weight:600;color:#10b981}
+.fbs{font-size:9.5px;color:#7a8bb0}
+.fdel{margin-left:auto;background:none;border:none;color:#3e4f72;cursor:pointer;font-size:14px}
+.fdel:hover{color:#ef4444}
+
+/* ── Form Fields ── */
+.fld{margin-bottom:9px}
+.fld label{display:block;font-size:10px;color:#7a8bb0;margin-bottom:3px;font-weight:500}
+.fld input{width:100%;background:#111827;border:1px solid #253050;border-radius:6px;
+  padding:7px 9px;color:#dde5f8;font-family:inherit;font-size:11.5px;transition:border-color .15s}
+.fld input:focus{outline:none;border-color:#3b82f6}
+.fld input::placeholder{color:#3e4f72}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;width:100%;padding:9px 14px;
+  border:none;border-radius:7px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;margin-top:4px}
+.bb{background:#3b82f6;color:#fff}
+.bb:hover{background:#2563eb;transform:translateY(-1px)}
+.bb:disabled{background:#1e2a45;color:#3e4f72;cursor:not-allowed;transform:none}
+.bg{background:#10b981;color:#000;font-weight:700}
+.bg:hover{background:#059669;transform:translateY(-1px)}
+.bg:disabled{background:#1e2a45;color:#3e4f72;cursor:not-allowed;transform:none}
+.bgh{background:transparent;border:1px solid #253050;color:#dde5f8}
+.bgh:hover{border-color:#3b82f6;color:#3b82f6}
+.ra{display:flex;gap:7px;flex-wrap:wrap}
+.ra .btn{flex:1;min-width:140px}
+.ra .bgh{flex:0 0 auto;width:auto;min-width:85px}
+
+/* ── Alert ── */
+.al{border-radius:7px;padding:7px 10px;font-size:11px;margin-top:7px}
+.al.err{background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.27);color:#fca5a5}
+.al.ok{background:rgba(16,185,129,.09);border:1px solid rgba(16,185,129,.27);color:#6ee7b7}
+.info{background:rgba(59,130,246,.09);border:1px solid rgba(59,130,246,.27);
+  border-radius:7px;padding:8px 11px;font-size:11px;color:#93c5fd;margin-bottom:11px;display:flex;align-items:center;gap:7px}
+
+/* ── Info Grid ── */
+.igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+.ib{background:#111827;border:1px solid #1e2a45;border-radius:6px;padding:8px 10px}
+.ib.w2{grid-column:span 2}
+.ib.w3{grid-column:span 3}
+.il{font-size:8.5px;text-transform:uppercase;letter-spacing:.8px;color:#3e4f72;margin-bottom:2px;font-weight:600}
+.iv{font-size:11px;font-weight:500;word-break:break-word}
+.iv.mt{color:#3e4f72;font-style:italic}
+
+/* ── Product Table ── */
+.tw{overflow-x:auto;border-radius:6px;border:1px solid #1e2a45;margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:10.5px}
+th{background:#161f35;padding:5px 7px;text-align:left;font-size:8.5px;text-transform:uppercase;
+  letter-spacing:.7px;color:#7a8bb0;border-bottom:1px solid #1e2a45;white-space:nowrap}
+td{padding:5px 7px;border-bottom:1px solid #1e2a45;vertical-align:top}
+tr:last-child td{border-bottom:none}
+.chip{display:inline-block;padding:1px 5px;border-radius:20px;font-size:9.5px;font-weight:600;background:rgba(59,130,246,.13);color:#93c5fd}
+.qc{display:inline-block;padding:1px 5px;border-radius:20px;font-size:9.5px;font-weight:700;background:rgba(16,185,129,.12);color:#6ee7b7}
+.empty{text-align:center;padding:36px 16px;color:#7a8bb0}
+
+/* ── Success Banner ── */
+.succ{background:rgba(16,185,129,.09);border:1px solid rgba(16,185,129,.27);
+  border-radius:8px;padding:16px;text-align:center;margin-top:10px}
+.succ h3{font-size:13px;font-weight:700;color:#10b981;margin-bottom:2px}
+.succ p{font-size:10.5px;color:#7a8bb0}
+
+/* ── Progress & Spinner ── */
+.spin{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,.2);
+  border-top-color:currentColor;border-radius:50%;animation:sp .65s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.pb{background:#1e2a45;border-radius:20px;height:3px;margin-top:6px;overflow:hidden}
+.pbr{height:100%;background:linear-gradient(90deg,#3b82f6,#10b981);border-radius:20px;transition:width .35s}
+.sep{height:1px;background:#1e2a45;margin:10px 0}
