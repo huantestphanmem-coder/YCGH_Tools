@@ -38,10 +38,9 @@ function setCellValue(xml, cellRef, value) {
 /** Duplicate row 22 template XML with a new row number and cell values */
 function makeProductRow(rowNum, p) {
   // Row 22 style template (s attributes preserved):
-  // A=s35(STT), B=s40(Mã), C=s56(Tên), D=s56(Tên cont), E=s41(NSX), F=s41(XuXu), G=s42(ĐV), H=s39(SL), I=s36(GC), J=s34
+  // A=s35(STT), B=s40(Mã), C=s56(Tên), D=s56(Tên cont), E=s41(NSX), F=s41(XuXu), G=s42(ĐV), H=s39(SL), I=s36(GC)
   const r = rowNum;
   const stt = p.stt != null ? `<v>${p.stt}</v>` : "";
-  const sttType = typeof p.stt === "number" ? "" : ' t="inlineStr"';
   const sttVal = typeof p.stt === "number"
     ? `<c r="A${r}" s="35">${stt}</c>`
     : `<c r="A${r}" s="35" t="inlineStr"><is><t>${escXml(p.stt)}</t></is></c>`;
@@ -50,7 +49,7 @@ function makeProductRow(rowNum, p) {
     ? `<c r="${col}${r}" s="${s}" t="inlineStr"><is><t xml:space="preserve">${escXml(val)}</t></is></c>`
     : `<c r="${col}${r}" s="${s}"/>`;
 
-  return `<row r="${r}" spans="1:10" s="1" customFormat="1" ht="71.25" customHeight="1" x14ac:dyDescent="0.2">`
+  return `<row r="${r}" spans="1:9" s="1" customFormat="1" ht="71.25" customHeight="1" x14ac:dyDescent="0.2">`
     + sttVal
     + mk("B", 40, p.m)
     + mk("C", 56, p.d)
@@ -60,7 +59,6 @@ function makeProductRow(rowNum, p) {
     + mk("G", 42, p.u)
     + mk("H", 39, p.q)
     + `<c r="I${r}" s="36"/>`
-    + `<c r="J${r}" s="34"/>`
     + `</row>`;
 }
 
@@ -102,6 +100,12 @@ export function generateYCGH(ext, ex, onProgress = () => {}) {
   // 3. Parse sheet XML
   let xml = DEC.decode(files["xl/worksheets/sheet1.xml"]);
 
+  // Strip column J cells from template (template rows 21-22 include J, which is extra)
+  xml = xml.replace(/<c r="J\d+"(?:\s[^>]*)?\s*\/>/g, "");
+  xml = xml.replace(/<c r="J\d+"(?:\s[^>]*)?>[\s\S]*?<\/c>/g, "");
+  // Update spans "1:10" → "1:9" for product rows in template
+  xml = xml.replace(/(<row\b[^>]*\bspans=)"1:10"/g, '$1"1:9"');
+
   const prods = ext.prods;
   const n = prods.length;
   const PS = 21; // product start row
@@ -109,10 +113,27 @@ export function generateYCGH(ext, ex, onProgress = () => {}) {
 
   onProgress(28);
 
-  // ── 4. Fill header rows 10-17, col D ──────────────────────────────────
+  // ── 4. Fill header fields ─────────────────────────────────────────────
+  // Date at top of document (C7:G7 merged)
+  xml = setCellValue(xml, "C7", buildDateStr());
+  // Header info table — verified by decoding template XML + sharedStrings:
+  // R10: C10="Số Báo giá"         → D10:G10 merged
+  // R11: C11="Khách hàng"         → D11:G11 merged
+  // R12: C12="Địa chỉ"            → D12:G12 merged
+  // R13: C13="Điện thoại"         → D13:G13 merged
+  // R14: C14="Đại diện bởi"       → D14:G14 merged
+  // R15: C15="MST"                → D15:G15 merged
+  // R16: C16="Dự án"              → D16:G16 merged
+  // R17: C17="Thời gian giao hàng"→ D17:G17 merged
   [
-    ["D10", ext.a], ["D11", ext.e], ["D12", ext.f], ["D13", ext.c],
-    ["D14", ext.h], ["D15", ex.mst], ["D16", ext.b], ["D17", ext.i],
+    ["D10", ext.a],   // Số Báo giá
+    ["D11", ext.e],   // Khách hàng
+    ["D12", ext.f],   // Địa chỉ
+    ["D13", ext.c],   // Điện thoại
+    ["D14", ext.h],   // Đại diện bởi
+    ["D15", ex.mst],  // MST
+    ["D16", ext.b],   // Dự án
+    ["D17", ext.i],   // Thời gian giao hàng
   ].forEach(([ref, val]) => { xml = setCellValue(xml, ref, val); });
 
   onProgress(40);
@@ -187,13 +208,17 @@ export function generateYCGH(ext, ex, onProgress = () => {}) {
 
   onProgress(68);
 
-  // ── 7. Fill additional info (shifted rows) ────────────────────────────
+  // ── 7. Fill supplementary form fields (rows shift with extra products)
+  // Verified by decoding template XML + sharedStrings:
+  // R23+sh: A23="Địa chỉ giao hàng:" → C23:I23 merged
+  // R24+sh: A24="Người nhận:"         → C24
+  // R25+sh: A25="Chứng Từ:"           → C25:E25 merged
+  // R30+sh: A30="Lưu ý khác:"         → C30:G30 merged
   const sh = extraRows;
   if (ex.dc) xml = setCellValue(xml, `C${23+sh}`, ex.dc);
   if (ex.nr) xml = setCellValue(xml, `C${24+sh}`, ex.nr);
   if (ex.ct) xml = setCellValue(xml, `C${25+sh}`, ex.ct);
   if (ex.gc) xml = setCellValue(xml, `C${30+sh}`, ex.gc);
-  xml = setCellValue(xml, `E${33+sh}`, buildDateStr());
 
   onProgress(80);
 

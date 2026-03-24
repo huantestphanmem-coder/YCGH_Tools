@@ -28,6 +28,9 @@ export default function App() {
   // Supplementary form
   const [ex, setEx] = useState(EMPTY_FORM);
 
+  // Validation state — true chỉ sau khi validation pass
+  const [validated, setValidated] = useState(false);
+
   // Read (Step 1) status
   const [rl, setRl]     = useState(false);
   const [rp, setRp]     = useState(0);
@@ -42,7 +45,7 @@ export default function App() {
   // ── Handlers ──────────────────────────────────────────────
 
   const handleFile = (f) => {
-    if (!/\.xlsx?$/i.test(f.name)) {
+    if (!/\.xlsx?$|\.xlsm$|\.xlsb$|\.xltx?$|\.xltm$/i.test(f.name)) {
       setRmsg({ t: "err", m: "❌ Chọn file .xlsx" });
       return;
     }
@@ -52,6 +55,7 @@ export default function App() {
       setFname(f.name);
       setFsize(f.size);
       setRmsg(null);
+      setValidated(false); // chưa validate — reset khi chọn file mới
     };
     r.readAsArrayBuffer(f);
   };
@@ -59,6 +63,7 @@ export default function App() {
   const handleClear = () => {
     setBuf(null); setFname(""); setFsize(0);
     setExt(null); setRmsg(null);
+    setValidated(false);
     setDone(false); setGmsg(null);
     setStep(1);
   };
@@ -68,8 +73,27 @@ export default function App() {
     setRl(true); setRp(15);
     try {
       const data = parseXlsxBuffer(buf);
+
+      // ── Validation: kiểm tra các trường bắt buộc ──────────────
+      const missing = [];
+      if (!data.a) missing.push("Số báo giá");
+      if (!data.e) missing.push("Khách hàng");
+      if (!data.prods || data.prods.length === 0) missing.push("Danh sách thiết bị (không tìm thấy sản phẩm nào)");
+
+      if (missing.length > 0) {
+        setRmsg({
+          t: "err",
+          m: `❌ File thiếu thông tin bắt buộc: ${missing.join(", ")}. Vui lòng kiểm tra lại file Excel.`,
+        });
+        setRl(false);
+        setRp(0);
+        return;
+      }
+      // ──────────────────────────────────────────────────────────
+
       setExt(data);
-      setRmsg({ t: "ok", m: `✅ Đọc thành công — ${data.prods.length} thiết bị` });
+      setValidated(true); // validation pass → bật tick xanh
+      setRmsg({ t: "ok", m: `✅ Đọc thành công — ${data.prods.length} thiết bị | Số BG ✓ Khách hàng ✓` });
       setStep(2); setRp(100);
       setTimeout(() => setRp(0), 500);
     } catch (e) {
@@ -122,6 +146,7 @@ export default function App() {
             buf={buf}
             fname={fname}
             fsize={fsize}
+            validated={validated}
             loading={rl}
             progress={rp}
             message={rmsg}

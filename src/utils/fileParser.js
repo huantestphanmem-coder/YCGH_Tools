@@ -42,14 +42,26 @@ export function parseXlsxBuffer(buf) {
   }
   data.i = tg;
 
-  // Extract product rows
-  const prods = [];
+  // Find product table header row (row with "STT" in column A)
+  let tableStart = 13; // fallback
   for (let ri = 0; ri < raw.length; ri++) {
-    const row = raw[ri];
-    if (!row) continue;
+    const cell = String((raw[ri] || [])[0] || "").trim().toUpperCase();
+    if (cell === "STT") {
+      tableStart = ri + 1;
+      break;
+    }
+  }
+
+  // Extract product rows — stop at first non-product row after table begins
+  const prods = [];
+  let foundFirstProduct = false;
+  for (let ri = tableStart; ri < raw.length; ri++) {
+    const row = raw[ri] || [];
+
+    // Skip fully empty rows
+    if (row.every(c => c == null)) continue;
 
     const stt = row[0];
-    if (typeof stt !== "number" || !Number.isInteger(stt) || stt < 1 || stt > 999) continue;
 
     // Take only first line of multi-line cells
     const cv = (col) => {
@@ -57,20 +69,30 @@ export function parseXlsxBuffer(buf) {
       return v == null ? "" : String(v).split("\n")[0].trim();
     };
 
-    const m = cv(1);
-    const desc = cv(2);
+    const m = cv(1); // Mã hàng hóa (col B)
+    const desc = cv(2); // Tên thiết bị (col C)
 
-    // Skip total rows and empty rows
-    if ((m + desc).toLowerCase().includes("tổng") || (!m && !desc)) continue;
+    // Non-integer STT → end of product table
+    if (typeof stt !== "number" || !Number.isInteger(stt) || stt < 1 || stt > 999) {
+      if (foundFirstProduct) break;
+      continue;
+    }
 
+    // Skip notes/disclaimers: rows that have an STT integer but missing mã or tên
+    if (!m || !desc) continue;
+
+    // Skip subtotal / summary rows
+    if ((m + desc).toLowerCase().includes("tổng")) continue;
+
+    foundFirstProduct = true;
     prods.push({
       stt,
       m,
-      d: desc,
-      br: cv(3),   // Brand / Nhà sản xuất
-      or: cv(4),   // Origin / Xuất xứ
-      u: cv(5),    // Unit / Đơn vị
-      q: row[6] ?? "",  // Quantity / Số lượng
+      d: desc,     // Tên thiết bị   — col C (index 2)
+      br: cv(3),   // Nhà sản xuất   — col D (index 3)
+      or: cv(4),   // Xuất xứ        — col E (index 4)
+      u: cv(5),    // Đơn vị         — col F (index 5)
+      q: row[6] ?? "",  // Số lượng  — col G (index 6)
     });
   }
 

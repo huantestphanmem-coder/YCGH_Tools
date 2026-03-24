@@ -12,7 +12,9 @@
       "Read(//Users/huannguyen/.ssh/**)",
       "Bash(ssh -T git@github.com)",
       "Bash(ssh-add -l)",
-      "Bash(ssh-add ~/.ssh/huantestphanmem-coder-GitHub)"
+      "Bash(ssh-add ~/.ssh/huantestphanmem-coder-GitHub)",
+      "Bash(node -e \":*)",
+      "Bash(ls -la \"/Users/huannguyen/Downloads/Vibe Coding/YCGH_Tools/\"*.html)"
     ]
   }
 }
