@@ -17,6 +17,12 @@ const NAV = [
     label: "Tạo báo giá",
     sub: "Chọn mã · Tính tổng",
   },
+  {
+    id: "compare",
+    icon: "⚖️",
+    label: "So sánh báo giá",
+    sub: "Upload 2 file · Tìm khác biệt",
+  },
 ];
 
 export default function Sidebar({ page, onNavigate }) {

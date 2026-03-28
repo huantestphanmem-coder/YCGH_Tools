@@ -13,6 +13,7 @@ import SupplementaryForm from "./components/SupplementaryForm";
 import PreviewCard from "./components/PreviewCard";
 import ProductCodeManager from "./pages/ProductCodeManager";
 import QuotePage from "./pages/QuotePage";
+import QuoteCompare from "./pages/QuoteCompare";
 
 const EMPTY_FORM = { dc: "", nr: "", ct: "", mst: "", gc: "" };
 
@@ -182,6 +183,8 @@ export default function App() {
             </div>
           ) : page === "products" ? (
             <ProductCodeManager />
+          ) : page === "compare" ? (
+            <QuoteCompare />
           ) : (
             <QuotePage />
           )}
