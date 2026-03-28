@@ -1,6 +1,12 @@
 import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { API_READY, apiFetch, apiPost } from "../utils/sheetApi";
 
+const fmtNum = (v) => {
+  const n = parseFloat(String(v).replace(/\./g, "").replace(/,/g, "."));
+  if (!v || v === "" || isNaN(n)) return v;
+  return n.toLocaleString("vi-VN");
+};
+
 const EMPTY = {
   maHang: "",
   moTa: "",
@@ -388,8 +394,8 @@ export default function ProductCodeManager() {
                     )}
                   </td>
                   <td>{row.xuatXuDayDu}</td>
-                  <td className="pm-num">{row.gia1}</td>
-                  <td className="pm-num">{row.gia2}</td>
+                  <td className="pm-num">{fmtNum(row.gia1)}</td>
+                  <td className="pm-num">{fmtNum(row.gia2)}</td>
                   <td>{row.tienTe && <span className="qc">{row.tienTe}</span>}</td>
                   <td>
                     <div className="pm-row-act">
