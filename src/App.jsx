@@ -6,15 +6,21 @@ import { parseXlsxBuffer } from "./utils/fileParser";
 import { generateYCGH } from "./utils/apiGenerator";
 
 import Header from "./components/Header";
+import Sidebar from "./components/Sidebar";
 import StepsIndicator from "./components/StepsIndicator";
 import FileUploadCard from "./components/FileUploadCard";
 import SupplementaryForm from "./components/SupplementaryForm";
 import PreviewCard from "./components/PreviewCard";
+import ProductCodeManager from "./pages/ProductCodeManager";
+import QuotePage from "./pages/QuotePage";
 
 const EMPTY_FORM = { dc: "", nr: "", ct: "", mst: "", gc: "" };
 
 export default function App() {
   const { xlsxOK, xlsxError } = useXlsxLoader();
+
+  // Page navigation
+  const [page, setPage] = useState("ycgh");
 
   // File state
   const [buf, setBuf]     = useState(null);
@@ -55,7 +61,7 @@ export default function App() {
       setFname(f.name);
       setFsize(f.size);
       setRmsg(null);
-      setValidated(false); // chưa validate — reset khi chọn file mới
+      setValidated(false);
     };
     r.readAsArrayBuffer(f);
   };
@@ -74,7 +80,6 @@ export default function App() {
     try {
       const data = parseXlsxBuffer(buf);
 
-      // ── Validation: kiểm tra các trường bắt buộc ──────────────
       const missing = [];
       if (!data.a) missing.push("Số báo giá");
       if (!data.e) missing.push("Khách hàng");
@@ -89,10 +94,9 @@ export default function App() {
         setRp(0);
         return;
       }
-      // ──────────────────────────────────────────────────────────
 
       setExt(data);
-      setValidated(true); // validation pass → bật tick xanh
+      setValidated(true);
       setRmsg({ t: "ok", m: `✅ Đọc thành công — ${data.prods.length} thiết bị | Số BG ✓ Khách hàng ✓` });
       setStep(2); setRp(100);
       setTimeout(() => setRp(0), 500);
@@ -130,46 +134,58 @@ export default function App() {
   return (
     <div className="app">
       <Header />
-      <div className="wrap">
-        <StepsIndicator currentStep={step} />
+      <div className="app-body">
+        <Sidebar page={page} onNavigate={setPage} />
 
-        {!xlsxOK && (
-          <div className="info">
-            <span className="spin" />
-            {xlsxError || "Đang tải thư viện đọc Excel..."}
-          </div>
-        )}
+        <main className="main-content">
+          {page === "ycgh" ? (
+            <div className="wrap">
+              <StepsIndicator currentStep={step} />
 
-        <div className="g2">
-          <FileUploadCard
-            xlsxOK={xlsxOK}
-            buf={buf}
-            fname={fname}
-            fsize={fsize}
-            validated={validated}
-            loading={rl}
-            progress={rp}
-            message={rmsg}
-            onFile={handleFile}
-            onRead={handleRead}
-            onClear={handleClear}
-          />
+              {!xlsxOK && (
+                <div className="info">
+                  <span className="spin" />
+                  {xlsxError || "Đang tải thư viện đọc Excel..."}
+                </div>
+              )}
 
-          <SupplementaryForm
-            values={ex}
-            onChange={handleFormChange}
-          />
+              <div className="g2">
+                <FileUploadCard
+                  xlsxOK={xlsxOK}
+                  buf={buf}
+                  fname={fname}
+                  fsize={fsize}
+                  validated={validated}
+                  loading={rl}
+                  progress={rp}
+                  message={rmsg}
+                  onFile={handleFile}
+                  onRead={handleRead}
+                  onClear={handleClear}
+                />
 
-          <PreviewCard
-            ext={ext}
-            loading={gl}
-            progress={gp}
-            message={gmsg}
-            done={done}
-            onGenerate={handleGenerate}
-            onReset={handleReset}
-          />
-        </div>
+                <SupplementaryForm
+                  values={ex}
+                  onChange={handleFormChange}
+                />
+
+                <PreviewCard
+                  ext={ext}
+                  loading={gl}
+                  progress={gp}
+                  message={gmsg}
+                  done={done}
+                  onGenerate={handleGenerate}
+                  onReset={handleReset}
+                />
+              </div>
+            </div>
+          ) : page === "products" ? (
+            <ProductCodeManager />
+          ) : (
+            <QuotePage />
+          )}
+        </main>
       </div>
     </div>
   );
