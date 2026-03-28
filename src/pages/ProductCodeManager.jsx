@@ -1,9 +1,35 @@
 import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { API_READY, apiFetch, apiPost } from "../utils/sheetApi";
 
+/** Parse chuỗi giá ở nhiều định dạng về số JS */
+const parsePrice = (v) => {
+  const s = String(v ?? "").trim().replace(/\s/g, "");
+  if (!s) return NaN;
+  if (s.includes(",") && s.includes(".")) {
+    // Cả hai dấu: dấu nào xuất hiện sau cùng là dấu thập phân
+    return s.lastIndexOf(",") > s.lastIndexOf(".")
+      ? parseFloat(s.replace(/\./g, "").replace(",", "."))  // vi: 2.976,04
+      : parseFloat(s.replace(/,/g, ""));                     // en: 2,976.04
+  }
+  if (s.includes(",") && !s.includes(".")) {
+    // Chỉ có dấu phẩy: nếu phần sau dấu phẩy cuối đúng 3 chữ số → hàng nghìn
+    const tail = s.split(",").pop();
+    return tail.length === 3 ? parseFloat(s.replace(/,/g, "")) : parseFloat(s.replace(",", "."));
+  }
+  if (s.includes(".") && !s.includes(",")) {
+    // Chỉ có dấu chấm: nếu TẤT CẢ phần sau dấu chấm đều đúng 3 chữ số → hàng nghìn
+    const parts = s.split(".");
+    return parts.slice(1).every(p => p.length === 3)
+      ? parseFloat(s.replace(/\./g, ""))  // 297.604 → 297604
+      : parseFloat(s);                     // 2976.04 → 2976.04
+  }
+  return parseFloat(s);
+};
+
 const fmtNum = (v) => {
-  const n = parseFloat(String(v).replace(/\./g, "").replace(/,/g, "."));
-  if (!v || v === "" || isNaN(n)) return v;
+  if (v === "" || v == null) return "";
+  const n = parsePrice(v);
+  if (isNaN(n)) return String(v ?? "");
   return n.toLocaleString("vi-VN");
 };
 
@@ -236,11 +262,20 @@ export default function ProductCodeManager() {
       "Nhãn hàng": r.nhanHang,
       "Xuất xứ": r.xuatXu,
       "Xuất xứ đầy đủ": r.xuatXuDayDu,
-      "Giá bán đại lý (mức 1)": r.gia1,
-      "Giá bán đại lý (mức 2)": r.gia2,
+      "Giá bán đại lý (mức 1)": parsePrice(r.gia1),
+      "Giá bán đại lý (mức 2)": parsePrice(r.gia2),
       "Tiền tệ": r.tienTe,
     }));
     const ws = window.XLSX.utils.json_to_sheet(exportData);
+    // Áp dụng format số có dấu chấm ngăn cách hàng nghìn cho cột gia1, gia2
+    const priceColLetters = ["G", "H"];
+    const wsRange = window.XLSX.utils.decode_range(ws["!ref"]);
+    for (let r = wsRange.s.r + 1; r <= wsRange.e.r; r++) {
+      priceColLetters.forEach(col => {
+        const addr = `${col}${r + 1}`;
+        if (ws[addr] && ws[addr].t === "n") ws[addr].z = "#,##0.##";
+      });
+    }
     const wb = window.XLSX.utils.book_new();
     window.XLSX.utils.book_append_sheet(wb, ws, "Mã hàng");
     window.XLSX.writeFile(wb, "quan-ly-ma-hang.xlsx");
