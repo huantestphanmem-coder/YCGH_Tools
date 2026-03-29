@@ -144,8 +144,8 @@ export function generateQuoteFromTemplate({ lines, computed, subTotal, vatAmount
       { v: c.xuatXu,                         isNum: false },
       { v: line.donVi,                       isNum: false },
       { v: parseFloat(line.soLuong) || 0,    isNum: true  },
-      { v: Math.round(c.donGia),             isNum: true  },
-      { v: Math.round(c.thanhTien),          isNum: true  },
+      { v: c.donGia,                          isNum: true  },
+      { v: c.thanhTien,                      isNum: true  },
     ])
   );
 
@@ -173,16 +173,16 @@ export function generateQuoteFromTemplate({ lines, computed, subTotal, vatAmount
       const origRowNum = n; // trước khi shift
       const colRef = colLetter(SUM_VAL_COL) + newRowNum;
       if (origRowNum === SUBTOTAL_ROW) {
-        xml = updateSummaryCell(xml, colRef, Math.round(subTotal));
+        xml = updateSummaryCell(xml, colRef, subTotal);
       } else if (origRowNum === VAT_ROW_TPL) {
-        xml = updateSummaryCell(xml, colRef, Math.round(vatAmount));
+        xml = updateSummaryCell(xml, colRef, vatAmount);
         // Cập nhật nhãn VAT% (thay sharedString bằng inlineStr)
         xml = xml.replace(
           /<c r="B\d+"[^>]*t="s"[^>]*>[\s\S]*?<\/c>/,
           `<c r="B${newRowNum}" s="77" t="inlineStr"><is><t xml:space="preserve">VAT - ${vat || 0}%</t></is></c>`
         );
       } else if (origRowNum === GRAND_ROW) {
-        xml = updateSummaryCell(xml, colRef, Math.round(grandTotal));
+        xml = updateSummaryCell(xml, colRef, grandTotal);
       }
       return xml;
     });
