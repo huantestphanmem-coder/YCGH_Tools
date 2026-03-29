@@ -81,7 +81,7 @@ function compareQuotes(rowsA, rowsB) {
 // ── Helpers ───────────────────────────────────────────────────
 const fmt = (v) => {
   const n = parseFloat(String(v));
-  return isNaN(n) ? String(v ?? "") : n.toLocaleString("vi-VN");
+  return isNaN(n) ? String(v ?? "") : n.toLocaleString("en-US");
 };
 
 const STATUS_META = {

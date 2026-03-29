@@ -30,7 +30,7 @@ const fmtNum = (v) => {
   if (v === "" || v == null) return "";
   const n = parsePrice(v);
   if (isNaN(n)) return String(v ?? "");
-  return n.toLocaleString("vi-VN");
+  return n.toLocaleString("en-US");
 };
 
 const EMPTY = {

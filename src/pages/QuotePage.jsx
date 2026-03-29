@@ -10,14 +10,31 @@ const newLine = () => ({ id: uid(), slots: [newSlot()], donVi: "", soLuong: 1 })
 
 function parseN(s) {
   if (typeof s === "number") return s;
-  // hỗ trợ cả định dạng VN (1.234.567) và EN (1,234,567)
-  const str = String(s || 0).trim();
-  const clean = str.replace(/\./g, "").replace(",", ".");
-  return parseFloat(clean) || 0;
+  const str = String(s || 0).trim().replace(/\s/g, "");
+  if (!str) return 0;
+  if (str.includes(",") && str.includes(".")) {
+    // Cả hai dấu: dấu nào sau cùng là thập phân
+    return str.lastIndexOf(",") > str.lastIndexOf(".")
+      ? parseFloat(str.replace(/\./g, "").replace(",", ".")) // vi: 2.976,04
+      : parseFloat(str.replace(/,/g, ""));                   // en: 2,976.04
+  }
+  if (str.includes(",") && !str.includes(".")) {
+    const tail = str.split(",").pop();
+    return tail.length === 3
+      ? parseFloat(str.replace(/,/g, ""))  // en ngàn: 1,234 → 1234
+      : parseFloat(str.replace(",", "."));  // vi lẻ:   1,5   → 1.5
+  }
+  if (str.includes(".") && !str.includes(",")) {
+    const parts = str.split(".");
+    return parts.slice(1).every(p => p.length === 3)
+      ? parseFloat(str.replace(/\./g, ""))  // vi ngàn: 1.234 → 1234
+      : parseFloat(str);                     // en lẻ:   1.5   → 1.5
+  }
+  return parseFloat(str) || 0;
 }
 
 function fmt(n) {
-  return Math.round(n || 0).toLocaleString("vi-VN");
+  return Math.round(n || 0).toLocaleString("en-US");
 }
 
 // ── Main component ────────────────────────────────────────────
